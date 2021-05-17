@@ -1,6 +1,6 @@
 import time
 from prometheus_client.core import GaugeMetricFamily, REGISTRY
-from prometheus_client import start_http_server
+from prometheus_client import start_http_server, Info
 from jtop import jtop
 
 class CustomCollector(object):
@@ -67,20 +67,6 @@ class CustomCollector(object):
         emc_gauge.add_metric(['max_freq'], value=self.jetson.emc['max_freq'])
         return emc_gauge
 
-    def __info(self):
-        info_gauge = GaugeMetricFamily(
-            'info','emc statistics from tegrastats', labels=['jetpack','L4T'],
-        )
-        info_gauge.add_metric([self.jetson.emc['info']['jetpack'], self.jetson.emc['info']['L4T']], value=0)
-        return info_gauge
-
-    def __hardware(self):
-        hardware_gauge = GaugeMetricFamily(
-            'hardware','emc statistics from tegrastats', labels=['SERIAL_NUMBER'],
-        )
-        hardware_gauge.add_metric([self.jetson.emc['hardware']['SERIAL_NUMBER']], value=0)
-        return hardware_gauge
-
     def collect(self):
         yield self.__cpu()
         yield self.__gpu()
@@ -92,10 +78,24 @@ class CustomCollector(object):
         yield self.__info()
         yield self.__hardware()
 
+def info_jetson(jetson):
+    i = Info('info', 'Description of info')
+    i.info(jetson.board['info'])
+
+def hardware_jetson(jetson):
+    i = Info('hardware', 'Description of hardware')
+    i.info(jetson.board['hardware'])    
+
+def libraries_jetson(jetson):
+    i = Info('libraries', 'Description of libraries')
+    i.info(jetson.board['libraries'])   
 
 if __name__ == '__main__':
     start_http_server(8001)
     with jtop() as jetson:
+        info_jetson(jetson)
+        hardware_jetson(jetson)
+        libraries_jetson(jetson)
         REGISTRY.register(CustomCollector(jetson))
         while True:
             time.sleep(1)
