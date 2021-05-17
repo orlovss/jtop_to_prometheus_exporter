@@ -75,8 +75,7 @@ class CustomCollector(object):
         yield self.__voltage()
         yield self.__nvpmodel()
         yield self.__emc()
-        yield self.__info()
-        yield self.__hardware()
+
 
 def info_jetson(jetson):
     i = Info('info', 'Description of info')
