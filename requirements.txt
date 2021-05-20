@@ -1,2 +1,2 @@
-prometheus-client=0.7.1
+prometheus-client==0.7.1
 jetson-stats==3.1.0

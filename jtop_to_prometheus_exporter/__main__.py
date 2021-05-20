@@ -1,7 +1,9 @@
 import time
+import argparse
 from prometheus_client.core import GaugeMetricFamily, REGISTRY
 from prometheus_client import start_http_server, Info
 from jtop import jtop
+
 
 class CustomCollector(object):
     def __init__(self,Jetson):
@@ -90,7 +92,10 @@ def libraries_jetson(jetson):
     i.info(jetson.board['libraries'])   
 
 if __name__ == '__main__':
-    start_http_server(8001)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, nargs='?', default=8000, help='Port on which metrics will be available.')
+    args = parser.parse_args()
+    start_http_server(args.port)
     with jtop() as jetson:
         info_jetson(jetson)
         hardware_jetson(jetson)
